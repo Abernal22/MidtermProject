@@ -49,6 +49,7 @@ class RegressionTree:
         self.limit = self.limits[limit]
         self.root = Leaf(data)
         stack = [(self.root,True)]
+        hlim = limit == 'height'
         #Loop and build tree
         while len(stack) > 0:
             #remove from stack and update if needed.
@@ -57,6 +58,9 @@ class RegressionTree:
             #If leaf has no varience we can continue to the next element
             if self.leafError(current) == 0:
                 continue
+            if not hlim:
+                if(current.data.shape[0] <= self.limit):
+                    continue
             #Determine best split available.
             dim, val, left, right = self.bestSplit(current)
             #Assign all parents and children then add to stack.
@@ -184,6 +188,12 @@ if __name__ == '__main__':
     print()
     print("Testing different split")
     print(tree)
+    print()
+    print("Testing leaf limit 4:")
+    print(RegressionTree(data, leafSize=4, limit = 'leaf'))
+    print()
+    print("Testing leaf limit 2:")
+    print(RegressionTree(data, leafSize=2, limit = 'leaf'))
 
 
 
