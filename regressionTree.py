@@ -89,8 +89,26 @@ class RegressionTree:
         return str(self.root)
 
 
+    #Sample is assumed to be a 1d array
     def predict(self, sample):
-        #TODO: traverse tree and get prediction
+        #Loop starting at root to find sample.
+        #If we reach a leaf we have found our prediction.
+        current = self.root
+        while current != None:
+            if isinstance(current, Leaf):
+                #We have a leaf and prediction, return mean as prediction
+                return current.getMean()
+            #If not leaf we can change the node to a child by looking at the split value.
+            #If less than or equal split value go left otherwise right.
+            #Split node value must be a tuple with feature and value to split at.
+            feature, value = current.getVal()
+            sVal = sample[feature]
+            if sVal <= value:
+                current = current.left
+            else:
+                current = current.right    
+
+        #Should not return none unless there is a problem.        
         return None
     
     def decision_path(self, sample):
@@ -206,6 +224,16 @@ if __name__ == '__main__':
     print()
     print("Testing height limit 1")
     print(RegressionTree(data, height=1))
+
+    #testing prediction
+    data = np.array([[1,5],[2,6],[3,12],[4,10],[5,30],[6,29], [7,35], [8,36]])
+    tree = RegressionTree(data, height=2)
+    print()
+    print("Testing prediction of [1,5], should be 5.5 with height of 2")
+    print(tree.predict(data[0]))
+
+
+
 
 
 
