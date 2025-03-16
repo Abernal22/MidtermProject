@@ -34,7 +34,9 @@ class Split(Node):
         self.right = right
     #Returns information to represent the split value and dimension.    
     def getVal(self):
-        return self.splitInfo  
+        return self.splitInfo
+    def __str__(self):
+        return f"Split: {self.splitInfo}, Left: {str(self.left)}, Right: {str(self.right)}"  
     
 
 class RegressionTree:
@@ -46,16 +48,35 @@ class RegressionTree:
         self.limits['leaf'] = self.leafSize
         self.limit = self.limits[limit]
         self.root = Leaf(data)
-        stack = [self.root]
+        stack = [(self.root,True)]
         #Loop and build tree
         while len(stack) > 0:
             #remove from stack and update if needed.
-            current = stack.pop()
+            current, dir = stack.pop()
             #First determine varience.
-            #If leaf has no varience we can continue
+            #If leaf has no varience we can continue to the next element
             if self.leafError(current) == 0:
                 continue
-
+            #Determine best split available.
+            dim, val, left, right = self.bestSplit(current)
+            #Assign all parents and children then add to stack.
+            #Change the current node to a split node.
+            newNode = Split((dim,val), left, right)
+            left.parent = newNode
+            right.parent = newNode
+            if current == self.root:
+                self.root = newNode
+            else:    
+                parent = current.parent
+                newNode.parent = parent
+                if dir:
+                    parent.right = newNode
+                else:
+                    parent.left = newNode
+            stack.append((right, True))
+            stack.append((left,False)) 
+    def __str__(self):
+        return str(self.root)
 
 
     def predict(self, sample):
@@ -155,6 +176,14 @@ if __name__ == '__main__':
     tree = RegressionTree(data)
     dim, val, left, right = tree.bestSplit(leafTest)
     print(f"Best split ({dim},{val}) Leaves: {left}, {right}")
+    print()
+    print("Testing Full Tree")
+    print(tree)
+    data = np.array([[1,5],[2,6],[3,12],[4,10],[5,30],[6,29], [7,35], [8,36]])
+    tree = RegressionTree(data)
+    print()
+    print("Testing different split")
+    print(tree)
 
 
 
