@@ -130,7 +130,7 @@ class RegressionTree:
                 print(f"Sample: (feature {feature}, value {sVal}) <= Split: (feature {feature}, value {value})")
                 current = current.left
             else:
-                print(f"Sample: feature {feature}, value {sVal} > Split: (feature {feature}, value {value})")
+                print(f"Sample: (feature {feature}, value {sVal}) > Split: (feature {feature}, value {value})")
                 current = current.right 
         return None
     #Assumed to be a leaf node to determine varience. 
