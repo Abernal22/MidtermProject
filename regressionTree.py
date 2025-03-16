@@ -2,28 +2,33 @@ import numpy as np
 
 class Node:
     #A node is supposed to be either a leaf node or a split node and have its own setup
-    def __init__(self):
-        pass
+    def __init__(self, parent):
+        self.parent = parent
     #Each node has some kind of overall value. Either a split or data.
     def getVal(self):
         raise NotImplementedError("Subclass must implement getVal()")
 
+
 #A leaf node will hold data or data indices and a mean label/output value.
 class Leaf(Node):
     #Making a leaf needs the data to hold, assumed to be a 2d matrix of samples and features.
-    def __init__(self, data):
-        super().__init__()
+    def __init__(self, data, parent=None):
+        super().__init__(parent)
         self.data = data
         #Compute mean of labels/output for the leaf for predictions. 
         self.mean = np.mean(self.data[:,-1])
     #Returns the mean of the label/output of leaf data.    
     def getVal(self):
-        return self.mean    
+        return self.data
+    def getMean(self):
+        return self.mean
+    def __str__(self):
+        return f"Data: {self.data}, mean: {self.mean}"    
 
 #A split node must have two children and holds split information and two child nodes.
 class Split(Node):
-    def __init__(self, splitInfo, left=None, right=None):
-        super().__init__()
+    def __init__(self, splitInfo, left=None, right=None, parent=None):
+        super().__init__(parent)
         self.splitInfo = splitInfo
         self.left = left
         self.right = right
@@ -40,7 +45,18 @@ class RegressionTree:
         self.limits['height'] = self.height
         self.limits['leaf'] = self.leafSize
         self.limit = self.limits[limit]
-        #TODO: Setup tree
+        self.root = Leaf(data)
+        stack = [self.root]
+        #Loop and build tree
+        while len(stack) > 0:
+            #remove from stack and update if needed.
+            current = stack.pop()
+            #First determine varience.
+            #If leaf has no varience we can continue
+            if self.leafError(current) == 0:
+                continue
+
+
 
     def predict(self, sample):
         #TODO: traverse tree and get prediction
@@ -49,12 +65,98 @@ class RegressionTree:
     def decision_path(self, sample):
         #TODO: traverse tree and display path with deduction rules.
         return None
+    #Assumed to be a leaf node to determine varience. 
+    def leafError(self, node):
+        error = 0
+        #Assumed to be samples.
+        data = node.getVal()
+        mean = node.getMean()    
+        for sample in data:
+            error += (sample[-1] - mean)**2
+        #Within leaf error is returned not including sample size.    
+        return error
+    
+    #returns best split with leafs and does not modify structures.
+    def bestSplit(self, leaf):
+        #Loop over all possible dimensions and values of given data to find split.
+        data = leaf.getVal()
+        #Excludes last column as output.
+        maxDim = data.shape[1] - 1
+        n = data.shape[0]
+        #Loop over features.
+        dim = -1
+        val = -1
+        leftEnd = None
+        rightEnd = None
+        #The original leaf error including sample size.
+        lowestError = (n+1)*self.leafError(leaf)
+        for i in range(n):
+            sample = data[i]
+            for x in range(maxDim):
+                value = sample[x]
+                left, right = self.splitLeaf(leaf, x, value)
+                if left == None or right == None:
+                    continue
+                lSize = left.data.shape[0]
+                rSize = right.data.shape[0]
+                #sum of squared errors
+                currentError = (lSize*self.leafError(left)) + (rSize*self.leafError(right))
+                #compare error
+                if currentError <= lowestError:
+                    #update values if we have a lower or equal error.
+                    lowestError = currentError
+                    dim = x
+                    val = value
+                    leftEnd = left
+                    rightEnd = right
+
+        return dim, val, leftEnd, rightEnd            
+
+
+
+
+
+    #Splits a leaf in a specific dimension and value and returns two new leafs.
+    #Does not modify any structures.
+    def splitLeaf(self, leaf, dimension, value):
+        data = leaf.getVal()
+        indices = data[:, dimension] <= value
+        #Spliting the values based on a dimension and given value.
+        left = data[indices]
+        right = data[~indices]
+        if len(left) == 0:
+            return None, Leaf(right)
+        if len(right) == 0:
+            return Leaf(left), None
+        return Leaf(left), Leaf(right)
+
+
+
+
+    
     
 #Tests
 if __name__ == '__main__':
     data = np.array([[1,2,3,4], [5,6,7,8], [9,10,11,12]])
     leafTest = Leaf(data)
-    print(f"Leaf mean is {leafTest.getVal()}")
+    print(f"Leaf mean is {leafTest.getMean()}")
+    #Test tree setup
+    tree = RegressionTree(data)
+    print(tree.root)
+    left, right = tree.splitLeaf(leafTest, 0, 1)
+    print(left)
+    print(right)
+    #Trying best split.
+    dim, val, left, right = tree.bestSplit(leafTest)
+    print(f"Best split ({dim},{val}) Leaves: {left}, {right}")
+    #Testing obvious split
+    data = np.array([[1,10],[2,12],[3,11],[4,20],[5,22],[6,21]])
+    leafTest = Leaf(data)
+    tree = RegressionTree(data)
+    dim, val, left, right = tree.bestSplit(leafTest)
+    print(f"Best split ({dim},{val}) Leaves: {left}, {right}")
+
+
 
 
 
