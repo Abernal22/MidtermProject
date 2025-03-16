@@ -255,6 +255,13 @@ if __name__ == '__main__':
     tree.decision_path(data[2])
 
 
+    #Tests with extra feature obvious splits in both features.
+    data = np.array([[1,1,10], [2,1,11], [5,1,21], [6,1,20], [1,2,60], [2,2,62], [5,2,72],[6,2,71]])
+    tree = RegressionTree(data, height=2)
+    print(tree)
+    tree.decision_path(data[5])
+
+
 
 
 
