@@ -55,7 +55,7 @@ class RegressionTree:
             #remove from stack and update if needed.
             current, dir, height = stack.pop()
             #First determine varience.
-            #If leaf has no varience we can continue to the next element
+            #If sum of squared errors is 0 we can continue to the next element
             if self.leafError(current) == 0:
                 continue
             #Leaf limiter
@@ -133,7 +133,7 @@ class RegressionTree:
                 print(f"Sample: (feature {feature}, value {sVal}) > Split: (feature {feature}, value {value})")
                 current = current.right 
         return None
-    #Assumed to be a leaf node to determine varience. 
+    #Assumed to be a leaf node to determine sum of squared errors 
     def leafError(self, node):
         error = 0
         #Assumed to be samples.
@@ -167,7 +167,7 @@ class RegressionTree:
                     continue
                 lSize = left.data.shape[0]
                 rSize = right.data.shape[0]
-                #sum of squared errors
+                #sum of squared errors multiplied by sample size of leafs for more weight on larger leafs.
                 currentError = (lSize*self.leafError(left)) + (rSize*self.leafError(right))
                 #compare error
                 if currentError <= lowestError:
