@@ -112,7 +112,26 @@ class RegressionTree:
         return None
     
     def decision_path(self, sample):
-        #TODO: traverse tree and display path with deduction rules.
+        #Loop starting at root to find sample and display path
+        current = self.root
+        print("Decision path:")
+        while current != None:
+            if isinstance(current, Leaf):
+                #We have a leaf and prediction, return mean as prediction and print leaf
+                print(f"Prediction: {current.getMean()}")
+                return current.getMean()
+            #If not leaf we can change the node to a child by looking at the split value.
+            #If less than or equal split value go left otherwise right.
+            #Split node value must be a tuple with feature and value to split at.
+            feature, value = current.getVal()
+            sVal = sample[feature]
+            if sVal <= value:
+                #Display feature and val path
+                print(f"Sample: (feature {feature}, value {sVal}) <= Split: (feature {feature}, value {value})")
+                current = current.left
+            else:
+                print(f"Sample: feature {feature}, value {sVal} > Split: (feature {feature}, value {value})")
+                current = current.right 
         return None
     #Assumed to be a leaf node to determine varience. 
     def leafError(self, node):
@@ -231,6 +250,9 @@ if __name__ == '__main__':
     print()
     print("Testing prediction of [1,5], should be 5.5 with height of 2")
     print(tree.predict(data[0]))
+
+    #Testing path
+    tree.decision_path(data[2])
 
 
 
