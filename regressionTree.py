@@ -43,6 +43,7 @@ class RegressionTree:
     def __init__(self, data, height=None, leafSize=None, limit='height'):
         self.limits = dict()
         self.height = height
+        self.treeheight = 0
         self.leafSize = leafSize
         self.limits['height'] = self.height
         self.limits['leaf'] = self.leafSize
@@ -54,6 +55,8 @@ class RegressionTree:
         while len(stack) > 0:
             #remove from stack and update if needed.
             current, dir, height = stack.pop()
+            if height > self.treeheight:
+                self.treeheight = height
             #First determine varience.
             #If sum of squared errors is 0 we can continue to the next element
             if self.leafError(current) == 0:
@@ -88,6 +91,9 @@ class RegressionTree:
             stack.append((left,False,height+1)) 
     def __str__(self):
         return str(self.root)
+    
+    def treeHeight(self):
+        return self.treeheight
 
 
     #Sample is assumed to be a 1d array
@@ -211,6 +217,7 @@ if __name__ == '__main__':
     print(f"Leaf mean is {leafTest.getMean()}")
     #Test tree setup
     tree = RegressionTree(data)
+    print(f"Height: {tree.treeHeight()}")
     print(tree.root)
     left, right = tree.splitLeaf(leafTest, 0, 1)
     print(left)
