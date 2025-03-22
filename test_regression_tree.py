@@ -18,15 +18,18 @@ data = np.column_stack((x, y))
 train_data, test_data = train_test_split(data, test_size=0.2, random_state=42)
 
 # Test different limits
-limits = [(None, None), (1 / 2, None), (3 / 4, None), (None, 2), (None, 4), (None, 8)]
+# 1/2 of log(100) about 3, 3/4 is about 5.
+limits = [(None, None), (3, None), (5, None), (None, 2), (None, 4), (None, 8)]
 results = []
 
 for height, leaf_size in limits:
     start_time = time.time()
-    tree = RegressionTree(train_data, height=height if height is not None else float('inf'),
-                          leafSize=leaf_size if leaf_size is not None else float('inf'),
+    tree = RegressionTree(train_data, height=height if height is not None else None,
+                          leafSize=leaf_size if leaf_size is not None else None,
                           limit='height' if height is not None else 'leaf')
     end_time = time.time()
+    print(tree)
+    print()
 
     # Test error
     predictions = np.array([tree.predict(sample) for sample in test_data])

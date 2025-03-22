@@ -60,8 +60,9 @@ class RegressionTree:
                 continue
             #Leaf limiter
             if not hlim:
-                if(current.data.shape[0] <= self.limit):
-                    continue
+                if not (self.limit == None):
+                    if(current.data.shape[0] <= self.limit):
+                        continue
             else:
                 if not (self.limit == None):
                     if self.limit >=0:
