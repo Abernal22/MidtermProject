@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from regressionTree import RegressionTree
 from multidimensional_regression_tree import train_dimensional_model
 
+np.random.seed(42)
+
 def generate_linear_system_data(N=500):
     X = np.random.uniform(low=[-5, -5], high=[5, 5], size=(N, 2))
     Y = np.zeros_like(X)
