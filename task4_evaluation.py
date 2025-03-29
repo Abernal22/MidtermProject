@@ -13,8 +13,8 @@ def generate_linear_system_data(N=500):
     
     return X, Y
 
-def generate_program_data(N =1000):
-    X = np.random.uniform(low =[3, 0], high = [3,15], size = (N, 2))
+def generate_program_data(N =10000):
+    X = np.random.uniform(low =[-3, 0], high = [3,15], size = (N, 2))
     Y = np.zeros_like(X)
     for i in range(N):
         x, z = X[i]
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     import time
     start = time.time()
     trees2, mse2 = train_dimensional_model(X2, Y2, height=12, limit='height')
-    trees2, mse2 = train_dimensional_model(X2, Y2, leafSize=10, limit='leaf')
+    trees2, mse2 = train_dimensional_model(X2, Y2, leafSize=1, limit='leaf')
 
     end = time.time()
 

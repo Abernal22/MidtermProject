@@ -34,10 +34,10 @@ def generate_vehicle_data(N=500):
     return X, Y
 
 #simple testing
-#if __name__ == "__main__":
-    #X, Y = generate_vehicle_data()
-    #trees, mse = train_dimensional_model(X, Y, height=5, limit='height')
-    #print("Test MSE:", mse)
+if __name__ == "__main__":
+    X, Y = generate_vehicle_data()
+    trees, mse = train_dimensional_model(X, Y, height=5, limit='height')
+    print("Test MSE:", mse)
 
 #for i in range(5):
     #print("Input state:", X[i])
